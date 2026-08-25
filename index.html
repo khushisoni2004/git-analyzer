@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GitScope - GitHub Profile Explorer</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(88, 166, 255, .13), transparent 24%),
+                radial-gradient(circle at 85% 30%, rgba(46, 160, 67, .10), transparent 25%),
+                #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        /* =========================
+   NAVBAR
+========================= */
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(13, 17, 23, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(240, 246, 252, .10);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .github-logo {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f0f6fc;
+            color: #0d1117;
+            font-size: 31px;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, .1),
+                0 8px 30px rgba(255, 255, 255, .10);
+            transition: .3s;
+        }
+
+        .github-logo:hover {
+            transform: rotate(-8deg) scale(1.08);
+            box-shadow: 0 0 25px rgba(88, 166, 255, .25);
+        }
+
+        .logo span {
+            color: #58a6ff;
+        }
+
+        .nav-right {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        /* =========================
+   HERO
+========================= */
+
+        .hero {
+            min-height: 470px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 70px 20px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow {
+            position: absolute;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            background: rgba(88, 166, 255, .10);
+            filter: blur(90px);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 850px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid #30363d;
+            background: #161b22;
+            border-radius: 50px;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 72px);
+            line-height: 1.08;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(90deg, #58a6ff, #79c0ff, #56d364);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 680px;
+            margin: auto;
+            color: #8b949e;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        /* =========================
+   SEARCH
+========================= */
+
+        .search-wrapper {
+            width: 92%;
+            max-width: 780px;
+            margin: -35px auto 30px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 18px;
+            background: rgba(22, 27, 34, .95);
+            border: 1px solid #30363d;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, .45);
+        }
+
+        .search-box:focus-within {
+            border-color: #58a6ff;
+            box-shadow:
+                0 0 0 3px rgba(88, 166, 255, .08),
+                0 25px 70px rgba(0, 0, 0, .5);
+        }
+
+        .search-icon {
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            color: #8b949e;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 15px 8px;
+            font-size: 16px;
+        }
+
+        .search-box input::placeholder {
+            color: #6e7681;
+        }
+
+        .search-box button {
+            border: none;
+            border-radius: 12px;
+            padding: 0 25px;
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: .25s;
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 160, 67, .25);
+        }
+
+        .example {
+            text-align: center;
+            color: #8b949e;
+            font-size: 14px;
+            margin-top: 14px;
+        }
+
+        .example span {
+            color: #58a6ff;
+            cursor: pointer;
+        }
+
+        /* =========================
+   LOADER
+========================= */
+
+        .loader-box {
+            text-align: center;
+            display: none;
+            padding: 30px;
+        }
+
+        .loader {
+            width: 45px;
+            height: 45px;
+            margin: 0 auto 13px;
+            border-radius: 50%;
+            border: 4px solid #21262d;
+            border-top-color: #58a6ff;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================
+   ERROR
+========================= */
+
+        .error {
+            width: 92%;
+            max-width: 720px;
+            margin: 25px auto;
+            padding: 18px 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(248, 81, 73, .55);
+            background: rgba(248, 81, 73, .09);
+            color: #ff7b72;
+            display: none;
+            text-align: center;
+        }
+
+        /* =========================
+   MAIN
+========================= */
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 45px auto 80px;
+            display: none;
+        }
+
+        /* =========================
+   PROFILE
+========================= */
+
+        .profile-card {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 35px;
+            padding: 34px;
+            border-radius: 22px;
+            background: linear-gradient(145deg,
+                    rgba(22, 27, 34, .96),
+                    rgba(13, 17, 23, .96));
+            border: 1px solid #30363d;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .35);
+        }
+
+        .profile-card::before {
+            content: "";
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            top: -180px;
+            right: -100px;
+            border-radius: 50%;
+            background: rgba(88, 166, 255, .12);
+            filter: blur(50px);
+        }
+
+        .profile-left {
+            text-align: center;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #21262d;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .4);
+        }
+
+        .online-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3fb950;
+            border: 4px solid #161b22;
+            right: 18px;
+            bottom: 18px;
+        }
+
+        .profile-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-info h2 {
+            font-size: 34px;
+            letter-spacing: -.5px;
+        }
+
+        .username {
+            margin-top: 5px;
+            font-size: 18px;
+            color: #58a6ff;
+        }
+
+        .bio {
+            margin: 20px 0;
+            max-width: 700px;
+            color: #c9d1d9;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .detail-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 11px;
+        }
+
+        .detail-pill {
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 8px 12px;
+            border-radius: 50px;
+            color: #b1bac4;
+            font-size: 13px;
+        }
+
+        .profile-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            color: #fff;
+            background: #238636;
+            transition: .2s;
+        }
+
+        .profile-link:hover {
+            background: #2ea043;
+            transform: translateY(-2px);
+        }
+
+        .secondary-link {
+            background: #21262d;
+            border: 1px solid #30363d;
+        }
+
+        /* =========================
+   STATS
+========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .stat {
+            padding: 22px 12px;
+            text-align: center;
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            background: rgba(22, 27, 34, .85);
+            transition: .25s;
+        }
+
+        .stat:hover {
+            transform: translateY(-4px);
+            border-color: #58a6ff;
+        }
+
+        .stat h3 {
+            font-size: 27px;
+            color: #58a6ff;
+        }
+
+        .stat p {
+            margin-top: 6px;
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        /* =========================
+   REPOSITORIES
+========================= */
+
+        .section-heading {
+            margin: 50px 0 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .section-heading h2 {
+            font-size: 27px;
+        }
+
+        .section-heading p {
+            color: #8b949e;
+        }
+
+        .repo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .repo-card {
+            position: relative;
+            background: linear-gradient(145deg, #161b22, #11161d);
+            border: 1px solid #30363d;
+            border-radius: 17px;
+            padding: 23px;
+            transition: .25s;
+            overflow: hidden;
+        }
+
+        .repo-card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .3);
+        }
+
+        .repo-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .repo-name {
+            color: #58a6ff;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .repo-name:hover {
+            text-decoration: underline;
+        }
+
+        .repo-type {
+            color: #8b949e;
+            font-size: 11px;
+            border: 1px solid #30363d;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .repo-description {
+            color: #8b949e;
+            margin: 14px 0 22px;
+            line-height: 1.6;
+            min-height: 45px;
+            font-size: 14px;
+        }
+
+        .repo-bottom {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .language {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .language-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #58a6ff;
+        }
+
+        /* =========================
+   FOOTER
+========================= */
+
+        footer {
+            border-top: 1px solid #21262d;
+            text-align: center;
+            padding: 30px;
+            color: #6e7681;
+            font-size: 14px;
+        }
+
+        footer span {
+            color: #58a6ff;
+        }
+
+        /* =========================
+   RESPONSIVE
+========================= */
+
+        @media(max-width:1000px) {
+
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+        @media(max-width:780px) {
+
+            nav {
+                padding: 14px 5%;
+            }
+
+            .nav-right {
+                display: none;
+            }
+
+            .hero {
+                min-height: 400px;
+            }
+
+            .profile-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .detail-grid,
+            .name-row,
+            .profile-actions {
+                justify-content: center;
+            }
+
+            .repo-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media(max-width:550px) {
+
+            .hero h1 {
+                letter-spacing: -1px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-icon {
+                display: none;
+            }
+
+            .search-box button {
+                padding: 14px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .profile-card {
+                padding: 24px 18px;
+            }
+
+            .profile-image {
+                width: 160px;
+                height: 160px;
+            }
+
+            .section-heading {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+
+        <div class="logo">
+
+            <div class="github-logo">
+                <i class="fa-brands fa-github"></i>
+            </div>
+
+            <div>
+                Git<span>Scope</span>
+            </div>
+
+        </div>
+
+        <div class="nav-right">
+            Powered by GitHub REST API
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="glow"></div>
+
+        <div class="hero-content">
+
+            <div class="badge">
+                <i class="fa-brands fa-github"></i>
+                Live GitHub Developer Explorer
+            </div>
+
+            <h1>
+                Explore the world of
+                <span>GitHub Developers</span>
+            </h1>
+
+            <p>
+                Search any public GitHub username and instantly explore
+                profile details, repositories, followers, stars,
+                programming languages and developer activity.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <div class="search-wrapper">
+
+        <div class="search-box">
+
+            <div class="search-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <input id="username" type="text" placeholder="Enter GitHub username..." autocomplete="off">
+
+            <button onclick="searchUser()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Search Profile
+            </button>
+
+        </div>
+
+        <div class="example">
+
+            Try:
+
+            <span onclick="setExample('octocat')">
+                octocat
+            </span>
+
+            •
+
+            <span onclick="setExample('torvalds')">
+                torvalds
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOADER -->
+
+    <div class="loader-box" id="loaderBox">
+
+        <div class="loader"></div>
+
+        <p>
+            Fetching GitHub profile...
+        </p>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div class="error" id="error"></div>
+
+
+    <!-- MAIN -->
+
+    <div class="container" id="container">
+
+
+        <!-- PROFILE -->
+
+        <div class="profile-card">
+
+
+            <div class="profile-left">
+
+                <div class="avatar-wrap">
+
+                    <img id="avatar" class="profile-image" alt="GitHub Profile">
+
+                    <div class="online-dot"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-info">
+
+
+                <div class="name-row">
+
+                    <h2 id="name"></h2>
+
+                    <span class="detail-pill">
+                        <i class="fa-brands fa-github"></i>
+                        GitHub Developer
+                    </span>
+
+                </div>
+
+
+                <div class="username" id="login">
+                </div>
+
+
+                <p class="bio" id="bio">
+                </p>
+
+
+                <div class="detail-grid">
+
+                    <span class="detail-pill" id="location">
+                    </span>
+
+                    <span class="detail-pill" id="company">
+                    </span>
+
+                    <span class="detail-pill" id="joined">
+                    </span>
+
+                </div>
+
+
+                <div class="profile-actions">
+
+                    <a id="profileLink" class="profile-link" target="_blank">
+                        <i class="fa-brands fa-github"></i>
+                        View on GitHub
+                    </a>
+
+                    <a id="blogLink" class="profile-link secondary-link" target="_blank" style="display:none">
+                        <i class="fa-solid fa-globe"></i>
+                        Visit Website
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <div class="stat">
+                <h3 id="reposCount">0</h3>
+                <p>Repositories</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="followers">0</h3>
+                <p>Followers</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="following">0</h3>
+                <p>Following</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="gists">0</h3>
+                <p>Public Gists</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="totalStars">0</h3>
+                <p>Total Stars</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="topLanguage">-</h3>
+                <p>Top Language</p>
+            </div>
+
+        </div>
+
+
+        <!-- REPOSITORIES -->
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    <i class="fa-solid fa-code-branch"></i>
+                    Featured Repositories
+                </h2>
+
+                <p>
+                    Highest-starred public repositories
+                </p>
+
+            </div>
+
+            <p id="repoInfo"></p>
+
+        </div>
+
+
+        <div class="repo-grid" id="repoGrid">
+        </div>
+
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        Built with HTML • CSS • JavaScript •
+        <span>
+            <i class="fa-brands fa-github"></i>
+            GitHub REST API
+        </span>
+
+    </footer>
+
+
+    <script>
+
+        /* ================================
+           EXAMPLE USER
+        ================================ */
+
+        function setExample(name) {
+
+            document.getElementById("username").value = name;
+
+            searchUser();
+
+        }
+
+
+        /* ================================
+           SEARCH
+        ================================ */
+
+        function searchUser() {
+
+            const username =
+                document.getElementById("username")
+                    .value
+                    .trim();
+
+
+            if (username === "") {
+
+                showError("Please enter a GitHub username.");
+
+                return;
+
+            }
+
+
+            getGitHubUser(username);
+
+        }
+
+
+        /* ================================
+           ENTER KEY SEARCH
+        ================================ */
+
+        document
+            .getElementById("username")
+            .addEventListener("keydown", function (event) {
+
+                if (event.key === "Enter") {
+
+                    searchUser();
+
+                }
+
+            });
+
+
+        /* ================================
+           GET USER
+        ================================ */
+
+        function getGitHubUser(username) {
+
+            hideError();
+
+            document.getElementById("container").style.display =
+                "none";
+
+            document.getElementById("loaderBox").style.display =
+                "block";
+
+
+            const api =
+                "https://api.github.com/users/" + username;
+
+
+            fetch(api)
+
+                .then(function (response) {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "GitHub user not found. Check username and try again."
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(function (user) {
+
+                    displayUser(user);
+
+                    getRepositories(username);
+
+                })
+
+                .catch(function (error) {
+
+                    stopLoader();
+
+                    showError(error.message);
+
+                });
+
+        }
+
+
+        /* ================================
+           DISPLAY USER
+        ================================ */
+
+        function displayUser(user) {
+
+            document.getElementById("avatar").src =
+                user.avatar_url;
+
+
+            document.getElementById("name").textContent =
+                user.name || user.login;
+
+
+            document.getElementById("login").textContent =
+                "@" + user.login;
+
+
+            document.getElementById("bio").textContent =
+                user.bio ||
+                "This developer has not added a bio yet.";
+
+
+            document.getElementById("location").innerHTML =
+                user.location
+                    ? '<i class="fa-solid fa-location-dot"></i> ' + user.location
+                    : '<i class="fa-solid fa-location-dot"></i> Location unavailable';
+
+
+            document.getElementById("company").innerHTML =
+                user.company
+                    ? '<i class="fa-solid fa-building"></i> ' + user.company
+                    : '<i class="fa-solid fa-building"></i> Independent Developer';
+
+
+            const joinDate =
+                new Date(user.created_at)
+                    .toLocaleDateString(
+                        "en-US",
+                        {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric"
+                        }
+                    );
+
+
+            document.getElementById("joined").innerHTML =
+                '<i class="fa-solid fa-calendar-days"></i> Joined ' +
+                joinDate;
+
+
+            document.getElementById("profileLink").href =
+                user.html_url;
+
+
+            document.getElementById("reposCount").textContent =
+                user.public_repos;
+
+
+            document.getElementById("followers").textContent =
+                formatNumber(user.followers);
+
+
+            document.getElementById("following").textContent =
+                formatNumber(user.following);
+
+
+            document.getElementById("gists").textContent =
+                user.public_gists;
+
+
+            const blog =
+                document.getElementById("blogLink");
+
+
+            if (user.blog) {
+
+                let url = user.blog;
+
+                if (!url.startsWith("http")) {
+
+                    url = "https://" + url;
+
+                }
+
+                blog.href = url;
+
+                blog.style.display =
+                    "inline-flex";
+
+            }
+            else {
+
+                blog.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        /* ================================
+           GET REPOSITORIES
+        ================================ */
+
+        function getRepositories(username) {
+
+            const api =
+                "https://api.github.com/users/"
+                + username
+                + "/repos?per_page=100&sort=updated";
+
+
+            fetch(api)
+
+                .then(function (response) {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Unable to fetch repositories."
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(function (repositories) {
+
+                    calculateStats(repositories);
+
+
+                    repositories.sort(function (a, b) {
+
+                        return (
+                            b.stargazers_count -
+                            a.stargazers_count
+                        );
+
+                    });
+
+
+                    displayRepositories(repositories);
+
+
+                    stopLoader();
+
+
+                    document.getElementById("container").style.display =
+                        "block";
+
+
+                    document.getElementById("container")
+                        .scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+
+                })
+
+                .catch(function (error) {
+
+                    stopLoader();
+
+                    showError(error.message);
+
+                });
+
+        }
+
+
+        /* ================================
+           CALCULATE STATS
+        ================================ */
+
+        function calculateStats(repositories) {
+
+            let totalStars = 0;
+
+            const languages = {};
+
+
+            repositories.forEach(function (repo) {
+
+                totalStars +=
+                    repo.stargazers_count;
+
+
+                if (repo.language) {
+
+                    if (languages[repo.language]) {
+
+                        languages[repo.language]++;
+
+                    }
+                    else {
+
+                        languages[repo.language] = 1;
+
+                    }
+
+                }
+
+            });
+
+
+            document.getElementById("totalStars").textContent =
+                formatNumber(totalStars);
+
+
+            let topLanguage = "N/A";
+
+            let maximum = 0;
+
+
+            for (let language in languages) {
+
+                if (languages[language] > maximum) {
+
+                    maximum =
+                        languages[language];
+
+                    topLanguage =
+                        language;
+
+                }
+
+            }
+
+
+            document.getElementById("topLanguage").textContent =
+                topLanguage;
+
+        }
+
+
+        /* ================================
+           DISPLAY REPOSITORIES
+        ================================ */
+
+        function displayRepositories(repositories) {
+
+            const grid =
+                document.getElementById("repoGrid");
+
+
+            grid.innerHTML = "";
+
+
+            document.getElementById("repoInfo").textContent =
+                repositories.length +
+                " public repositories";
+
+
+            const topRepos =
+                repositories.slice(0, 10);
+
+
+            if (topRepos.length === 0) {
+
+                grid.innerHTML =
+                    "<p>No public repositories available.</p>";
+
+                return;
+
+            }
+
+
+            topRepos.forEach(function (repo) {
+
+                const card =
+                    document.createElement("div");
+
+
+                card.className =
+                    "repo-card";
+
+
+                const description =
+                    repo.description ||
+                    "No description provided for this repository.";
+
+
+                const language =
+                    repo.language ||
+                    "Not specified";
+
+
+                card.innerHTML = `
+
+            <div class="repo-top">
+
+                <a
+                    class="repo-name"
+                    href="${repo.html_url}"
+                    target="_blank"
+                >
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    ${repo.name}
+                </a>
+
+                <span class="repo-type">
+                    Public
+                </span>
+
+            </div>
+
+
+            <p class="repo-description">
+                ${description}
+            </p>
+
+
+            <div class="repo-bottom">
+
+                <span class="language">
+
+                    <span class="language-dot"></span>
+
+                    ${language}
+
+                </span>
+
+
+                <span>
+                    <i class="fa-regular fa-star"></i>
+                    ${repo.stargazers_count}
+                </span>
+
+
+                <span>
+                    <i class="fa-solid fa-code-fork"></i>
+                    ${repo.forks_count}
+                </span>
+
+
+                <span>
+                    <i class="fa-regular fa-circle-dot"></i>
+                    ${repo.open_issues_count}
+                </span>
+
+            </div>
+
+        `;
+
+
+                grid.appendChild(card);
+
+            });
+
+        }
+
+
+        /* ================================
+           NUMBER FORMAT
+        ================================ */
+
+        function formatNumber(number) {
+
+            if (number >= 1000000) {
+
+                return (
+                    number / 1000000
+                ).toFixed(1) + "M";
+
+            }
+
+
+            if (number >= 1000) {
+
+                return (
+                    number / 1000
+                ).toFixed(1) + "K";
+
+            }
+
+
+            return number;
+
+        }
+
+
+        /* ================================
+           ERROR
+        ================================ */
+
+        function showError(message) {
+
+            const error =
+                document.getElementById("error");
+
+
+            error.innerHTML =
+                '<i class="fa-solid fa-triangle-exclamation"></i> '
+                + message;
+
+
+            error.style.display =
+                "block";
+
+
+            document.getElementById("container").style.display =
+                "none";
+
+        }
+
+
+        function hideError() {
+
+            document.getElementById("error").style.display =
+                "none";
+
+        }
+
+
+        /* ================================
+           LOADER
+        ================================ */
+
+        function stopLoader() {
+
+            document.getElementById("loaderBox").style.display =
+                "none";
+
+        }
+
+    </script>
+
+</body>
+
+</html>
